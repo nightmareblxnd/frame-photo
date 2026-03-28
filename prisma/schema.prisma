@@ -114,6 +114,7 @@ model Article {
   description String   
   content     String   @db.Text
   image       String   
+  author      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
