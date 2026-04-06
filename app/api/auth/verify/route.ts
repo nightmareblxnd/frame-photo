@@ -29,7 +29,6 @@ export async function POST(request: Request) {
 
 
     if (verification.expiresAt < new Date()) {
-      // Удаляем просроченный мусор из базы
       await prisma.verificationCode.delete({ where: { id: verification.id } });
       return NextResponse.json({ error: "Время действия кода истекло. Запросите новый." }, { status: 400 });
     }
