@@ -10,7 +10,6 @@ const CATEGORIES = [
   "Студийное оборудование", "Системы стабилизации", "Аксессуары", "Карты памяти"
 ];
 
-
 interface Spec {
   name: string;
   value: string;
@@ -28,16 +27,17 @@ export default function NewProductPage() {
     subcategory: "",
     price: "",
     oldPrice: "",
-    image: "",
+    image: "", // Главная фотография (обложка)
     description: "", 
     rating: "5.0",
     inStock: true,
   });
 
-
+  // Состояния для динамических списков
   const [specifications, setSpecifications] = useState<Spec[]>([]);
+  const [additionalImages, setAdditionalImages] = useState<string[]>([]); // Состояние для доп. фото
 
-
+  // Управление характеристиками
   const addSpec = () => {
     setSpecifications([...specifications, { name: "", value: "" }]);
   };
@@ -52,23 +52,47 @@ export default function NewProductPage() {
     setSpecifications(newSpecs);
   };
 
+  // Управление дополнительными фотографиями
+  const addImage = () => {
+    setAdditionalImages([...additionalImages, ""]);
+  };
+
+  const removeImage = (index: number) => {
+    setAdditionalImages(additionalImages.filter((_, i) => i !== index));
+  };
+
+  const updateImage = (index: number, value: string) => {
+    const newImages = [...additionalImages];
+    newImages[index] = value;
+    setAdditionalImages(newImages);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
-  
+    // Фильтруем пустые значения
     const validSpecs = specifications.filter(spec => spec.name.trim() !== "" && spec.value.trim() !== "");
+    const validImages = additionalImages.filter(url => url.trim() !== "");
 
+    // Формируем данные для Prisma
     const dataToSend = {
       ...formData,
       price: Number(formData.price),
       oldPrice: formData.oldPrice ? Number(formData.oldPrice) : null,
       rating: formData.rating ? Number(formData.rating) : null,
-  
+      
+      // Связанные таблицы Prisma создаст автоматически
       specifications: {
         create: validSpecs.map((spec, index) => ({
           name: spec.name,
           value: spec.value,
+          order: index
+        }))
+      },
+      images: {
+        create: validImages.map((url, index) => ({
+          url: url,
           order: index
         }))
       }
@@ -170,9 +194,8 @@ export default function NewProductPage() {
               </div>
             </div>
 
-     
+            {/* Описание */}
             <div className="pt-6 border-t border-gray-100 space-y-8">
-              
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">Описание товара</label>
                 <textarea 
@@ -226,10 +249,46 @@ export default function NewProductPage() {
                 </div>
               </div>
 
+              {/* Главная фотография */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Ссылка на фотографию *</label>
-                <input required type="text" placeholder="/images/..." value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none" />
-                <p className="text-xs text-gray-400 mt-2">Рекомендуемый формат .png или .webp, можно указать путь к картинке в папке public</p>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Ссылка на главную фотографию (Обложка) *</label>
+                <input required type="text" placeholder="/images/main-photo.webp" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none" />
+                <p className="text-xs text-gray-400 mt-2">Эта картинка будет отображаться в каталоге на карточке товара</p>
+              </div>
+
+              {/* БЛОК ДОПОЛНИТЕЛЬНЫХ ФОТО */}
+              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">Дополнительные фотографии (Галерея)</h3>
+                    <p className="text-xs text-gray-500 mt-1">Добавьте ссылки на другие ракурсы товара</p>
+                  </div>
+                  <button type="button" onClick={addImage} className="text-xs font-medium bg-white px-3 py-1.5 rounded-lg border border-gray-200 hover:border-purple-300 hover:text-purple-600 transition-colors flex items-center gap-1 shadow-sm">
+                    <Plus className="h-3 w-3" /> Добавить фото
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {additionalImages.map((url, index) => (
+                    <div key={index} className="flex gap-3">
+                      <input 
+                        type="text" 
+                        placeholder="Ссылка на фото (напр. /images/photo-2.webp)" 
+                        value={url} 
+                        onChange={(e) => updateImage(index, e.target.value)} 
+                        className="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-purple-500 outline-none"
+                      />
+                      <button type="button" onClick={() => removeImage(index)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-white rounded-lg border border-transparent hover:border-red-100 transition-colors">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                  {additionalImages.length === 0 && (
+                    <div className="text-center py-4 bg-white rounded-xl border border-dashed border-gray-300">
+                      <p className="text-sm text-gray-400">Дополнительных фотографий пока нет</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <label className="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors w-max">
