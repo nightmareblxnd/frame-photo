@@ -35,12 +35,12 @@ interface SearchResult {
 const popularSearches = [
   "Sony A7 IV",
   "Canon R6 Mark II",
-  "SanDisk Extreme Pro",
+  "SanDisk",
   "Manfrotto штатив",
-  "RF 70-200mm",
-  "Peak Design рюкзак",
+  "Sigma объектив",
+  "Peak Design фотосумка",
   "Карты памяти CFexpress",
-  "Объектив 50mm f/1.2",
+  "Объектив 50mm",
 ];
 
 // Иконки для категорий
@@ -392,7 +392,7 @@ export function SearchBlock() {
           {/* Популярные бренды */}
           <div className="mt-6 text-center text-sm text-gray-400">
             <span>Популярные бренды: </span>
-            {["Sony", "Canon", "Nikon", "Fujifilm", "Leica", "Godox", "Manfrotto", "DJI"].map((brand, i, arr) => (
+            {["Sony", "Canon", "Nikon", "Fujifilm", "Panasonic", "Godox", "Manfrotto", "DJI"].map((brand, i, arr) => (
               <span key={brand}>
                 <button
                   onClick={() => handleSearch(brand)}
