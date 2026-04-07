@@ -27,7 +27,7 @@ export default function NewProductPage() {
     subcategory: "",
     price: "",
     oldPrice: "",
-    image: "", // Главная фотография (обложка)
+    image: "", 
     description: "", 
     rating: "5.0",
     inStock: true,
@@ -35,7 +35,7 @@ export default function NewProductPage() {
 
   // Состояния для динамических списков
   const [specifications, setSpecifications] = useState<Spec[]>([]);
-  const [additionalImages, setAdditionalImages] = useState<string[]>([]); // Состояние для доп. фото
+  const [additionalImages, setAdditionalImages] = useState<string[]>([]); 
 
   // Управление характеристиками
   const addSpec = () => {
@@ -71,18 +71,15 @@ export default function NewProductPage() {
     e.preventDefault();
     setIsSaving(true);
 
-    // Фильтруем пустые значения
     const validSpecs = specifications.filter(spec => spec.name.trim() !== "" && spec.value.trim() !== "");
     const validImages = additionalImages.filter(url => url.trim() !== "");
 
-    // Формируем данные для Prisma
     const dataToSend = {
       ...formData,
       price: Number(formData.price),
       oldPrice: formData.oldPrice ? Number(formData.oldPrice) : null,
       rating: formData.rating ? Number(formData.rating) : null,
-      
-      // Связанные таблицы Prisma создаст автоматически
+
       specifications: {
         create: validSpecs.map((spec, index) => ({
           name: spec.name,
