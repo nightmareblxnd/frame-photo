@@ -25,7 +25,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
   }
 }
 
-// ОБНОВЛЕНИЕ (РЕДАКТИРОВАНИЕ)
+
 export async function PATCH(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
