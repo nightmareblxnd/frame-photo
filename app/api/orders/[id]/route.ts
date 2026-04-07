@@ -19,7 +19,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const { id } = await params;
     const body = await request.json();
 
-    // Обновляем статус заказа
+
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: { status: body.status },
